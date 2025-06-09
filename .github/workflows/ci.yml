@@ -33,8 +33,8 @@ jobs:
 
       - name: Check man page
         run: |
-          man -w diff_numerics
-          man diff_numerics | head -20
+          man -w diff-numerics
+          man diff-numerics | head -20
 
       - name: Uninstall binary and man page
         run: |
@@ -42,7 +42,7 @@ jobs:
 
       - name: Check that binary and man page are uninstalled
         run: |
-          if man -w diff_numerics; then
+          if man -w diff-numerics; then
             echo "ERROR: man page still present after uninstall"
             exit 1
           else
