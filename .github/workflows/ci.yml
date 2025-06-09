@@ -22,12 +22,6 @@ jobs:
         run: |
           make
 
-      - name: Copy test data files to build directory
-        run: |
-          mkdir -p build
-          find . -name "*.dat" -exec cp {} build/ \; || true
-        working-directory: ${{ github.workspace }}
-
       - name: Run tests
         run: |
           make test
