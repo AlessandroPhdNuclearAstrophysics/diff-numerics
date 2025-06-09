@@ -254,11 +254,7 @@ std::string NumericDiff::stripAnsi(const std::string& input) const {
 }
 
 // Overload printSideBySide to accept any_error
-void NumericDiff::printSideBySide(const std::string& line1, const std::string& line2, bool any_error) const {
-    // If suppress_common_lines_ is true, only print if any_error is true
-    if (suppress_common_lines_ && !any_error) {
-        return;
-    }
+void NumericDiff::printSideBySide(const std::string& line1, const std::string& line2) const {
     int width = line_length_;
     std::string l1 = line1, l2 = line2;
     std::string l1_plain = stripAnsi(l1);
@@ -326,11 +322,6 @@ void NumericDiff::printSideBySide(const std::string& line1, const std::string& l
     bool has_red = (l1.find("\033[31m") != std::string::npos) || (l2.find("\033[31m") != std::string::npos);
     const char* sep = has_red ? "   |   " : "       ";
     std::cout << l1 << sep << l2 << "\n";
-}
-
-// Keep the original printSideBySide for backward compatibility
-void NumericDiff::printSideBySide(const std::string& line1, const std::string& line2) const {
-    printSideBySide(line1, line2, true);
 }
 
 // Print differences in a diff-like format

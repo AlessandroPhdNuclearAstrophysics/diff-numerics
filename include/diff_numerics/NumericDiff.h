@@ -58,7 +58,6 @@ private:
     void compareValues(double value1, double value2) const;
     // Print diff output in various formats
     void printDiff(const std::string& line1, const std::string& line2, const std::string& errors) const;
-    void printSideBySide(const std::string& line1, const std::string& line2, bool any_error) const;
     void printSideBySide(const std::string& line1, const std::string& line2) const;
     // Print a string in red (for errors)
     inline void printRed(std::string& str) const {
