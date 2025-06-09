@@ -50,7 +50,16 @@ std::string project_root() {
 // runs the comparison, and returns the output as a string.
 std::string run_diff(const std::string& file1, const std::string& file2, double tol, double threshold, bool side_by_side, bool suppress_common_lines, bool only_equal, bool quiet) {
     testing::internal::CaptureStdout();
-    NumericDiff diff(file1, file2, tol, threshold, side_by_side, "#", 60, suppress_common_lines, only_equal, quiet);
+    NumericDiffOption opts;
+    opts.file1 = file1;
+    opts.file2 = file2;
+    opts.tolerance = tol;
+    opts.threshold = threshold;
+    opts.side_by_side = side_by_side;
+    opts.suppress_common_lines = suppress_common_lines;
+    opts.only_equal = only_equal;
+    opts.quiet = quiet;
+    NumericDiff diff(opts);
     diff.run();
     return testing::internal::GetCapturedStdout();
 }
@@ -218,7 +227,14 @@ TEST(DiffNumerics, ColorDifferentDigits) {
     std::string file1 = test_data_path("delta_3P2-3F2.dat");
     std::string file2 = test_data_path("delta_3P2-3F2_2.dat");
     testing::internal::CaptureStdout();
-    NumericDiff diff(file1, file2, 1E-2, 1E-6, true, "#", 60, false, false, false, true);
+    NumericDiffOption opts;
+    opts.file1 = file1;
+    opts.file2 = file2;
+    opts.tolerance = 1E-2;
+    opts.threshold = 1E-6;
+    opts.side_by_side = true;
+    opts.color_diff_digits = true;
+    NumericDiff diff(opts);
     diff.run();
     std::string output = testing::internal::GetCapturedStdout();
     // Should contain ANSI red color code for only the differing digits

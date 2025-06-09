@@ -12,6 +12,7 @@
 // -------------------------------------------------------------
 
 #include "../include/diff-numerics/NumericDiff.h"
+#include "diff-numerics/NumericDiffOption.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -20,10 +21,22 @@
 #include <cmath>
 #include <numeric>
 #include <iomanip> // For std::setw
+#include <set>
 
-// Constructor: initialize all options and file paths
-NumericDiff::NumericDiff(const std::string& file1, const std::string& file2, double tol, double threshold, bool side_by_side, const std::string& comment_char, int line_length, bool suppress_common_lines, bool only_equal, bool quiet, bool color_diff_digits)
-    : file1_(file1), file2_(file2), tol_(tol), threshold_(threshold), side_by_side_(side_by_side), comment_char_(comment_char), line_length_(line_length), suppress_common_lines_(suppress_common_lines), only_equal_(only_equal), quiet_(quiet), color_diff_digits_(color_diff_digits), diff_lines_(0), max_percentage_error_(0.0) {}
+// Constructor: initialize from options struct
+NumericDiff::NumericDiff(const NumericDiffOption& opts)
+    : file1_(opts.file1),
+      file2_(opts.file2),
+      tol_(opts.tolerance),
+      threshold_(opts.threshold),
+      side_by_side_(opts.side_by_side),
+      comment_char_(opts.comment_char),
+      line_length_(opts.line_length),
+      suppress_common_lines_(opts.suppress_common_lines),
+      only_equal_(opts.only_equal),
+      quiet_(opts.quiet),
+      color_diff_digits_(opts.color_diff_digits),
+      columns_to_compare_(opts.columns_to_compare) {}
 
 // Main entry: run the comparison and print results
 void NumericDiff::run() {
@@ -150,6 +163,10 @@ void NumericDiff::compareLine(const std::string& line1, const std::string& line2
     bool any_error = false;
     double max_diff_this_line = 0.0;
     for (size_t i = 0; i < n; ++i) {
+        if (!columns_to_compare_.empty() && columns_to_compare_.count(i + 1) == 0) {
+            // Skip this column entirely (do not print)
+            continue;
+        }
         // Compare only if both tokens are numeric
         if (isNumeric(tokens1[i]) && isNumeric(tokens2[i])) {
             double v1 = std::stod(tokens1[i]);

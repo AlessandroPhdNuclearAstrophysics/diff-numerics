@@ -158,11 +158,12 @@ The binary will be placed in the `bin/` directory.
 | `-s`, `--report-identical-files` | Print only if files are equal within tolerance, otherwise print summary   |
 | `-q`, `--quiet`               | Suppress all output if files are equal within tolerance                     |
 | `-d`, `--color-different-digits` | Colorize only the part of the numbers that differ                        |
+| `-C`, `--columns <list>`         | Comma-separated list of columns (0-based) to compare                     |
 
 ### Example
 
 ```bash
-./bin/diff-numerics -y -d -t 0.01 -T 1e-5 data1.dat data2.dat
+./bin/diff-numerics -y -d -C 2,3 -t 0.01 -T 1e-5 data1.dat data2.dat
 ```
 
 ---
@@ -200,9 +201,9 @@ This project is licensed under the terms of the GNU General Public License v3.0.
 
 ## TODO / Ideas
 
-- Give the possibility to colorize only the part of the numbers that differ.
+- Give the possibility to ignore the columns that for both files are zero for each line.
+- Give the possiblity to choose the columns to compare.
 - Realign lines whose number are different in the two files but are otherwise similar.
-- Add unit tests and CI integration.
 - Support for config files.
 - Output to HTML/Markdown.
 - GUI frontend.
