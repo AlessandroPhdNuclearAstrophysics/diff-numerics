@@ -92,12 +92,13 @@ Contributions are welcome! Please open issues or pull requests for bug fixes, ne
 
 ## License
 
-[MIT License](LICENSE) (or specify your license here)
+This project is licensed under the terms of the GNU General Public License v3.0. See the [LICENSE](LICENSE) file for details.
 
 ---
 
 ## TODO / Ideas
 
+- Realign lines whose number are different in the two files but are otherwise similar.
 - Add unit tests and CI integration.
 - Support for config files.
 - Output to HTML/Markdown.
