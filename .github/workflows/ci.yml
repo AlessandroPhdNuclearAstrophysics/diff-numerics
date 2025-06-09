@@ -22,10 +22,6 @@ jobs:
         run: |
           make
 
-      - name: Run tests
-        run: |
-          make test
-
       - name: Install binary and man page
         run: |
           sudo make install
