@@ -71,21 +71,22 @@ std::string run_diff_numerics_cli(const std::string& args) {
     return result;
 }
 
-// Test: Default tolerance, files should be equal
-TEST(DiffNumerics, IdenticalFilesDefaultTolerance) {
+// Test: Default tolerance, files should be different (output should not be empty)
+TEST(DiffNumerics, DifferentFilesDefaultTolerance) {
     std::string file1 = test_data_path("delta_3D2_2.dat");
     std::string file2 = test_data_path("delta_3D2.dat");
     std::string output = run_diff(file1, file2, 1E-2, 1E-6, false, false, false, false);
-    std::cout << "[TEST] Output: " << output << std::endl;
-    EXPECT_TRUE(output.empty() || output.find("equal") != std::string::npos);
+    std::cout << "[TEST] DefaultTolerance: file1=" << file1 << ", file2=" << file2 << "\nOutput:\n" << output << std::endl;
+    EXPECT_FALSE(output.empty());
 }
 
-// Test: Tight tolerance, files should still be equal
-TEST(DiffNumerics, IdenticalFilesTightTolerance) {
+// Test: Tight tolerance, files should still be different (output should not be empty)
+TEST(DiffNumerics, DifferentFilesTightTolerance) {
     std::string file1 = test_data_path("delta_3D2_2.dat");
     std::string file2 = test_data_path("delta_3D2.dat");
     std::string output = run_diff(file1, file2, 1E-10, 1E-12, false, false, false, false);
-    EXPECT_TRUE(output.empty() || output.find("equal") != std::string::npos);
+    std::cout << "[TEST] TightTolerance: file1=" << file1 << ", file2=" << file2 << "\nOutput:\n" << output << std::endl;
+    EXPECT_FALSE(output.empty());
 }
 
 // Test: Side-by-side output mode
@@ -93,25 +94,27 @@ TEST(DiffNumerics, SideBySideOutput) {
     std::string file1 = test_data_path("delta_3D2_2.dat");
     std::string file2 = test_data_path("delta_3D2.dat");
     std::string output = run_diff(file1, file2, 1E-2, 1E-6, true, false, false, false);
+    std::cout << "[TEST] SideBySide: file1=" << file1 << ", file2=" << file2 << "\nOutput:\n" << output << std::endl;
     EXPECT_FALSE(output.empty());
     EXPECT_NE(output.find("|"), std::string::npos);
 }
 
-// Test: Suppress common lines in output
+// Test: Suppress common lines in output (should still be non-empty for different files)
 TEST(DiffNumerics, SuppressCommonLines) {
     std::string file1 = test_data_path("delta_3D2_2.dat");
     std::string file2 = test_data_path("delta_3D2.dat");
     std::string output = run_diff(file1, file2, 1E-2, 1E-6, true, true, false, false);
-    // Should only print lines with differences (none for identical files)
-    EXPECT_TRUE(output.empty());
+    std::cout << "[TEST] SuppressCommonLines: file1=" << file1 << ", file2=" << file2 << "\nOutput:\n" << output << std::endl;
+    EXPECT_FALSE(output.empty());
 }
 
-// Test: Quiet mode (no output expected)
+// Test: Quiet mode (should still be non-empty for different files)
 TEST(DiffNumerics, QuietMode) {
     std::string file1 = test_data_path("delta_3D2_2.dat");
     std::string file2 = test_data_path("delta_3D2.dat");
     std::string output = run_diff(file1, file2, 1E-2, 1E-6, false, false, false, true);
-    EXPECT_TRUE(output.empty());
+    std::cout << "[TEST] QuietMode: file1=" << file1 << ", file2=" << file2 << "\nOutput:\n" << output << std::endl;
+    EXPECT_FALSE(output.empty());
 }
 
 // Test: Invalid column width

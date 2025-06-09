@@ -25,6 +25,7 @@ private:
     bool side_by_side_;
     std::string comment_char_;
     int line_length_;
+    // suppress_common_lines_ only suppresses common lines if explicitly set (not by -y/side_by_side alone)
     bool suppress_common_lines_;
     bool only_equal_;
     bool quiet_;

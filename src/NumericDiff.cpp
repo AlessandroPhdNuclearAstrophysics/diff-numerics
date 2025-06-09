@@ -36,21 +36,37 @@ void NumericDiff::run() {
     }
     std::string line1, line2;
     size_t total_lines = 0;
-    while (std::getline(fin1, line1) && std::getline(fin2, line2)) {
-        if ((!comment_char_.empty() && line1.find(comment_char_) == 0) ||
-            (!comment_char_.empty() && line2.find(comment_char_) == 0)) {
-            continue;
+    bool file1_has_line = true, file2_has_line = true;
+    while (true) {
+        // Advance file1 to next non-comment line
+        while (file1_has_line) {
+            if (!std::getline(fin1, line1)) {
+                file1_has_line = false;
+                line1.clear();
+                break;
+            }
+            if (comment_char_.empty() || !isLineComment(line1)) break;
         }
+        // Advance file2 to next non-comment line
+        while (file2_has_line) {
+            if (!std::getline(fin2, line2)) {
+                file2_has_line = false;
+                line2.clear();
+                break;
+            }
+            if (comment_char_.empty() || !isLineComment(line2)) break;
+        }
+        if (!file1_has_line && !file2_has_line) break;
         ++total_lines;
         compareLine(line1, line2);
     }
     while (std::getline(fin1, line1)) {
-        if (!comment_char_.empty() && line1.find(comment_char_) == 0) continue;
+        if (!comment_char_.empty() && isLineComment(line1)) continue;
         ++total_lines;
         compareLine(line1, "");
     }
     while (std::getline(fin2, line2)) {
-        if (!comment_char_.empty() && line2.find(comment_char_) == 0) continue;
+        if (!comment_char_.empty() && isLineComment(line2)) continue;
         ++total_lines;
         compareLine("", line2);
     }
@@ -187,8 +203,12 @@ void NumericDiff::compareLine(const std::string& line1, const std::string& line2
 
     // Print in diff style
     if (side_by_side_) {
-        // Only print if any_error is true, or if suppress_common_lines_ is false
-        if (any_error || !suppress_common_lines_) {
+        if (suppress_common_lines_) {
+            if (any_error) {
+                printSideBySide(toPrint1, toPrint2);
+            }
+            // else: do not print common lines
+        } else {
             printSideBySide(toPrint1, toPrint2);
         }
     } else {
