@@ -1,0 +1,36 @@
+name: CI (Ubuntu)
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-test-install:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake
+
+      - name: Build with Makefile
+        run: |
+          make
+
+      - name: Run tests
+        run: |
+          make test
+
+      - name: Install binary and man page
+        run: |
+          sudo make install
+
+      - name: Check man page
+        run: |
+          man -w diff_numerics
+          man diff_numerics | head -20
