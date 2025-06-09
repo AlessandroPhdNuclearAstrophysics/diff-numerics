@@ -245,4 +245,26 @@ TEST(DiffNumerics, ColorDifferentDigits) {
     EXPECT_TRUE(first_red != std::string::npos && first_reset != std::string::npos && first_reset > first_red);
 }
 
+// Test: Compare only columns 1, 2, and 4 of delta_3P2-3F2.dat and delta_3P2-3F2_2.dat; expect no output (columns are equal)
+TEST(DiffNumerics, P2F2_Columns1_2_4_Equal) {
+    std::string file1 = test_data_path("delta_3P2-3F2.dat");
+    std::string file2 = test_data_path("delta_3P2-3F2_2.dat");
+    NumericDiffOption opts;
+    opts.file1 = file1;
+    opts.file2 = file2;
+    opts.tolerance = 1E-2;
+    opts.threshold = 1E-6;
+    opts.side_by_side = false; // normal mode
+    opts.suppress_common_lines = false;
+    opts.only_equal = false;
+    opts.quiet = false;
+    opts.color_diff_digits = false;
+    opts.columns_to_compare = {1, 2, 4}; // columns are 1-based
+    testing::internal::CaptureStdout();
+    NumericDiff diff(opts);
+    diff.run();
+    std::string output = testing::internal::GetCapturedStdout();
+    EXPECT_TRUE(output.empty());
+}
+
 // Add more tests for different tolerances, thresholds, and options as needed
