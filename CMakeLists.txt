@@ -34,3 +34,6 @@ add_executable(diff_numerics ${SOURCES})
 set_target_properties(diff_numerics PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin"
 )
+
+install(TARGETS diff_numerics DESTINATION bin)
+install(FILES ${CMAKE_SOURCE_DIR}/diff_numerics.1 DESTINATION share/man/man1)
