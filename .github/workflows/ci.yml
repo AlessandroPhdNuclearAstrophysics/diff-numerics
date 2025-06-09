@@ -43,5 +43,9 @@ jobs:
 
       - name: Check that binary and man page are uninstalled
         run: |
-          man -w diff_numerics
-          man diff_numerics | head -20
+          if man -w diff_numerics; then
+            echo "ERROR: man page still present after uninstall"
+            exit 1
+          else
+            echo "Man page correctly uninstalled"
+          fi
