@@ -23,6 +23,7 @@ int main(int argc, char* argv[]) {
     bool only_equal = false;
     bool quiet = false;
     int line_length = 60;
+    bool color_diff_digits = false;
     // Usage message for help
     const std::string usage = "Usage: " + std::string(argv[0]) + " [options] file1 file2\n"
                         "Options:\n"
@@ -33,7 +34,8 @@ int main(int argc, char* argv[]) {
                         "  -c, --comment-string <str> String to start a comment (default: #)\n"
                         "  -w, --single-column-width <n> Set column width for side-by-side output (default: 60)\n"
                         "  -s, --report-identical-files  Print only if files are equal within tolerance, otherwise print summary\n"
-                        "  -q, --quiet               Suppress all output if files are equal within tolerance\n";
+                        "  -q, --quiet               Suppress all output if files are equal within tolerance\n"
+                        "  -d, --color-different-digits  Colorize only the part of the numbers that differ\n";
     std::string file1, file2;
 
     // Manual option parsing
@@ -76,6 +78,8 @@ int main(int argc, char* argv[]) {
             only_equal = true;
         } else if (arg == "-q" || arg == "--quiet") {
             quiet = true;
+        } else if (arg == "-d" || arg == "--color-different-digits") {
+            color_diff_digits = true;
         } else if (file1.empty()) {
             file1 = arg;
         } else if (file2.empty()) {
@@ -114,7 +118,7 @@ int main(int argc, char* argv[]) {
     }
 
     // Run the numeric diff with the selected options
-    NumericDiff diff(file1, file2, tolerance, threshold, side_by_side, comment_char, line_length, suppress_common_lines, only_equal, quiet);
+    NumericDiff diff(file1, file2, tolerance, threshold, side_by_side, comment_char, line_length, suppress_common_lines, only_equal, quiet, color_diff_digits);
     diff.run();
 
     return 0;

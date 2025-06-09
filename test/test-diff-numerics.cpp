@@ -213,4 +213,20 @@ TEST(DiffNumericsCLI, P2F2_CLISummary) {
     EXPECT_NE(out.find("max percentage error"), std::string::npos);
 }
 
+// Test: Colorize only differing digits
+TEST(DiffNumerics, ColorDifferentDigits) {
+    std::string file1 = test_data_path("delta_3P2-3F2.dat");
+    std::string file2 = test_data_path("delta_3P2-3F2_2.dat");
+    testing::internal::CaptureStdout();
+    NumericDiff diff(file1, file2, 1E-2, 1E-6, true, "#", 60, false, false, false, true);
+    diff.run();
+    std::string output = testing::internal::GetCapturedStdout();
+    // Should contain ANSI red color code for only the differing digits
+    EXPECT_NE(output.find("\033[31m"), std::string::npos);
+    // Should not colorize the entire number if only a few digits differ
+    size_t first_red = output.find("\033[31m");
+    size_t first_reset = output.find("\033[0m", first_red);
+    EXPECT_TRUE(first_red != std::string::npos && first_reset != std::string::npos && first_reset > first_red);
+}
+
 // Add more tests for different tolerances, thresholds, and options as needed

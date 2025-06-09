@@ -14,7 +14,7 @@
 class NumericDiff {
 public:
     // Constructor: set up comparison options and file paths
-    NumericDiff(const std::string& file1, const std::string& file2, double tol, double threshold, bool side_by_side, const std::string& comment_char = "#", int line_length = 60, bool suppress_common_lines = false, bool only_equal = false, bool quiet = false);
+    NumericDiff(const std::string& file1, const std::string& file2, double tol, double threshold, bool side_by_side, const std::string& comment_char = "#", int line_length = 60, bool suppress_common_lines = false, bool only_equal = false, bool quiet = false, bool color_diff_digits = false);
     // Run the comparison and print results according to options
     void run();
 private:
@@ -30,6 +30,7 @@ private:
     bool suppress_common_lines_;
     bool only_equal_;
     bool quiet_;
+    bool color_diff_digits_ = false;
 private:
     // Helper: count columns in a file
     uint filesColumns(const std::string& file) const;
@@ -72,6 +73,8 @@ private:
     std::string extractVisiblePrefix(const std::string& input, size_t n) const;
     // Ensure the string ends with the ANSI reset code if the last color set is not reset
     void ensureAnsiReset(std::string& str) const;
+    // Helper: colorize only the differing digits between two numeric strings
+    void colorizeDiffDigits(std::string& s1, std::string& s2) const;
 
     // For summary/statistics
     mutable size_t diff_lines_ = 0;

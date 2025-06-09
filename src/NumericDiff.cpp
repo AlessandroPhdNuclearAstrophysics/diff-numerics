@@ -22,8 +22,8 @@
 #include <iomanip> // For std::setw
 
 // Constructor: initialize all options and file paths
-NumericDiff::NumericDiff(const std::string& file1, const std::string& file2, double tol, double threshold, bool side_by_side, const std::string& comment_char, int line_length, bool suppress_common_lines, bool only_equal, bool quiet)
-    : file1_(file1), file2_(file2), tol_(tol), threshold_(threshold), side_by_side_(side_by_side), comment_char_(comment_char), line_length_(line_length), suppress_common_lines_(suppress_common_lines), only_equal_(only_equal), quiet_(quiet), diff_lines_(0), max_percentage_error_(0.0) {}
+NumericDiff::NumericDiff(const std::string& file1, const std::string& file2, double tol, double threshold, bool side_by_side, const std::string& comment_char, int line_length, bool suppress_common_lines, bool only_equal, bool quiet, bool color_diff_digits)
+    : file1_(file1), file2_(file2), tol_(tol), threshold_(threshold), side_by_side_(side_by_side), comment_char_(comment_char), line_length_(line_length), suppress_common_lines_(suppress_common_lines), only_equal_(only_equal), quiet_(quiet), color_diff_digits_(color_diff_digits), diff_lines_(0), max_percentage_error_(0.0) {}
 
 // Main entry: run the comparison and print results
 void NumericDiff::run() {
@@ -160,12 +160,15 @@ void NumericDiff::compareLine(const std::string& line1, const std::string& line2
                 if (std::abs(diff) > max_diff_this_line) max_diff_this_line = std::abs(diff);
                 std::string t1 = tokens1[i];
                 std::string t2 = tokens2[i];
-                printRed(t1);
-                printRed(t2);
+                if (color_diff_digits_) {
+                    colorizeDiffDigits(t1, t2);
+                } else {
+                    printRed(t1);
+                    printRed(t2);
+                }
                 output1.push_back(t1);
                 output2.push_back(t2);
                 is_diff.push_back(true);
-                // Format the error column with right alignment
                 std::ostringstream oss;
                 oss << std::setw(static_cast<int>(col_widths[i])) << std::setfill(' ') << std::right << diff << "%";
                 errors.push_back(oss.str());
@@ -349,4 +352,57 @@ void NumericDiff::ensureAnsiReset(std::string& str) const {
     if (last_red != std::string::npos && (last_reset == std::string::npos || last_reset < last_red)) {
         str += reset;
     }
+}
+
+// Colorize only the digits that differ between s1 and s2 (ANSI red: \033[31m ... \033[0m)
+void NumericDiff::colorizeDiffDigits(std::string& s1, std::string& s2) const {
+    // If either string contains 'e' or 'E', split into mantissa and exponent
+    auto split_exp = [](const std::string& s) -> std::pair<std::string, std::string> {
+        size_t epos = s.find_first_of("eE");
+        if (epos == std::string::npos) return {s, ""};
+        return {s.substr(0, epos), s.substr(epos)};
+    };
+    auto [mant1, exp1] = split_exp(s1);
+    auto [mant2, exp2] = split_exp(s2);
+
+    std::string out1, out2;
+    size_t n = std::min(mant1.size(), mant2.size());
+    size_t diff_start = n;
+    // Find first differing digit in mantissa
+    for (size_t i = 0; i < n; ++i) {
+        if (mant1[i] != mant2[i]) {
+            diff_start = i;
+            break;
+        }
+    }
+    // If mantissas are different length, diff starts at min size
+    if (mant1.size() != mant2.size()) {
+        diff_start = std::min(diff_start, n);
+    }
+    // Build colored mantissas: everything after diff_start is red
+    if (diff_start < mant1.size()) {
+        out1 = mant1.substr(0, diff_start) + "\033[31m" + mant1.substr(diff_start) + "\033[0m";
+    } else {
+        out1 = mant1;
+    }
+    if (diff_start < mant2.size()) {
+        out2 = mant2.substr(0, diff_start) + "\033[31m" + mant2.substr(diff_start) + "\033[0m";
+    } else {
+        out2 = mant2;
+    }
+    // If any difference in mantissa, color all exponent (even if equal)
+    if (!exp1.empty() || !exp2.empty()) {
+        if (diff_start < n || mant1.size() != mant2.size()) {
+            if (!exp1.empty()) out1 += "\033[31m" + exp1 + "\033[0m";
+            if (!exp2.empty()) out2 += "\033[31m" + exp2 + "\033[0m";
+        } else if (exp1 == exp2) {
+            out1 += exp1;
+            out2 += exp2;
+        } else {
+            if (!exp1.empty()) out1 += "\033[31m" + exp1 + "\033[0m";
+            if (!exp2.empty()) out2 += "\033[31m" + exp2 + "\033[0m";
+        }
+    }
+    s1 = out1;
+    s2 = out2;
 }
