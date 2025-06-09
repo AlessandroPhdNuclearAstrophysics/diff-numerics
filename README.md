@@ -1,6 +1,91 @@
 # diff-numerics
 
-A command-line tool for comparing numerical data files with configurable tolerance, threshold, and output formatting. Designed for scientific and engineering workflows where small floating-point differences are expected.
+---
+**Project Overview**
+
+`diff-numerics` is a professional C++ tool for comparing numerical data files with configurable tolerance, threshold, and output options. It is designed for scientific and engineering workflows where precise numerical comparison is required.
+
+- **Source code:** See `src/` and `include/diff_numerics/`
+- **Tests:** See `test/` (uses GoogleTest)
+- **Build system:** CMake and Makefile (see below)
+- **Documentation:** Man page (`diff_numerics.1`), this README, and code comments
+
+---
+
+## Project Structure
+
+- `src/` - Main source files for the diff-numerics tool
+- `include/diff_numerics/` - Public headers (notably `NumericDiff.h`)
+- `test/` - Test suite, test data, and test CMake configuration
+- `bin/` - Built executables
+- `build/` - CMake build directory (not in version control)
+- `Makefile` - Top-level automation for build, install, test, and clean
+- `CMakeLists.txt` - Top-level CMake configuration
+- `diff_numerics.1` - Man page for the command-line tool
+
+---
+
+## Building and Installing
+
+### With Makefile (recommended)
+
+```sh
+make           # Build the project
+make test      # Run the test suite
+sudo make install   # Install binary, headers, and man page
+sudo make uninstall # Remove installed files
+make clean     # Remove build artifacts
+```
+
+### With CMake directly
+
+```sh
+cmake -S . -B build
+cmake --build build
+cd build && ctest --output-on-failure
+sudo cmake --install build
+```
+
+---
+
+## Testing
+
+- Tests are written with GoogleTest and located in `test/test_diff_numerics.cpp`.
+- Test data files are in `test/`.
+- Run `make test` or `ctest` from the build directory to execute all tests.
+
+---
+
+## Contributing
+
+- See `CONTRIBUTING.md` for guidelines.
+- Code style is enforced via `.clang-format` and `.editorconfig`.
+- Please read the comments in each source file for guidance on structure and intent.
+
+---
+
+## Documentation
+
+- The code is heavily commented for clarity and onboarding.
+- See the man page (`diff_numerics.1`) for command-line usage.
+- For more details, see the comments at the top of each source, header, and build file.
+
+---
+
+## License
+
+See `LICENSE` for details.
+
+---
+
+## TODO / Ideas
+
+- Realign lines whose number are different in the two files but are otherwise similar.
+- Add unit tests and CI integration.
+- Support for config files.
+- Output to HTML/Markdown.
+- GUI frontend.
+- Improved error handling and reporting.
 
 ---
 

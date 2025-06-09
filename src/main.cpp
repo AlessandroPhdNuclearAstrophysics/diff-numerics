@@ -1,10 +1,20 @@
+// main.cpp
+// -------------------------------------------------------------
+// This is the main entry point for the diff-numerics command-line tool.
+// It parses command-line arguments, configures options, and runs the
+// NumericDiff class to compare two numerical data files.
+//
+// Usage and options are printed if arguments are missing or invalid.
+// -------------------------------------------------------------
+
 #include <iostream>
 #include <string>
 #include <vector>
 #include <cstdlib>
-#include "../headers/libs/NumericDiff.h"
+#include "diff_numerics/NumericDiff.h"
 
 int main(int argc, char* argv[]) {
+    // Option variables with defaults
     bool side_by_side = false;
     double tolerance = 1E-2;
     double threshold = 1E-6;
@@ -13,6 +23,7 @@ int main(int argc, char* argv[]) {
     bool only_equal = false;
     bool quiet = false;
     int line_length = 60;
+    // Usage message for help
     const std::string usage = "Usage: " + std::string(argv[0]) + " [options] file1 file2\n"
                         "Options:\n"
                         "  -y, --side-by-side        Print lines side by side\n"
@@ -33,17 +44,33 @@ int main(int argc, char* argv[]) {
         } else if (arg == "-ys" || arg == "--suppress-common-lines") {
             suppress_common_lines = true;
             side_by_side = true;
-        } else if ((arg == "-tol" || arg == "-tolerance" || arg == "-t" || arg == "--tolerance") && i + 1 < argc) {
-            tolerance = std::atof(argv[++i]);
+        } else if ((arg == "-tol" || arg == "-tolerance" || arg == "-t" || arg == "--tolerance")) {
+            if (i + 1 < argc) {
+                tolerance = std::atof(argv[++i]);
+            } else {
+                std::cerr << "Error: Missing value for " << arg << " option.\n" << usage;
+                return 1;
+            }
         } else if (arg == "-threshold" || arg == "-T" || arg == "--threshold") {
             if (i + 1 < argc) {
                 threshold = std::atof(argv[++i]);
+            } else {
+                std::cerr << "Error: Missing value for " << arg << " option.\n" << usage;
+                return 1;
             }
-        } else if ((arg == "-comment" || arg == "-c" || arg == "--comment-string") && i + 1 < argc) {
-            comment_char = argv[++i];
+        } else if ((arg == "-comment" || arg == "-c" || arg == "--comment-string")) {
+            if (i + 1 < argc) {
+                comment_char = argv[++i];
+            } else {
+                std::cerr << "Error: Missing value for " << arg << " option.\n" << usage;
+                return 1;
+            }
         } else if (arg == "-w" || arg == "--single-column-width") {
             if (i + 1 < argc) {
                 line_length = std::atoi(argv[++i]);
+            } else {
+                std::cerr << "Error: Missing value for " << arg << " option.\n" << usage;
+                return 1;
             }
         } else if (arg == "--only-equal" || arg == "-s" || arg == "--report-identical-files") {
             only_equal = true;
@@ -54,16 +81,39 @@ int main(int argc, char* argv[]) {
         } else if (file2.empty()) {
             file2 = arg;
         } else {
-            std::cerr << "Unknown or extra argument: " << arg << std::endl;
+            std::cerr << "Unknown or extra argument: " << arg << "\n" << usage;
             return 1;
         }
     }
 
+    // Check for required file arguments
     if (file1.empty() || file2.empty()) {
-        std::cerr << usage;
+        std::cerr << "Error: Two input files must be specified.\n" << usage;
+        return 1;
+    }
+    if (file1 == file2) {
+        std::cerr << "Error: The two input files must be different.\n" << usage;
         return 1;
     }
 
+    // Validate numeric options
+    const int min_col_width = 10, max_col_width = 200;
+    const double min_tol = 1e-15, max_tol = 1e+3;
+    const double min_threshold = 0.0, max_threshold = 1e+3;
+    if (line_length < min_col_width || line_length > max_col_width) {
+        std::cerr << "Error: Column width (" << line_length << ") must be between " << min_col_width << " and " << max_col_width << ".\n" << usage;
+        return 1;
+    }
+    if (tolerance < min_tol || tolerance > max_tol) {
+        std::cerr << "Error: Tolerance (" << tolerance << ") must be between " << min_tol << " and " << max_tol << ".\n" << usage;
+        return 1;
+    }
+    if (threshold < min_threshold || threshold > max_threshold) {
+        std::cerr << "Error: Threshold (" << threshold << ") must be between " << min_threshold << " and " << max_threshold << ".\n" << usage;
+        return 1;
+    }
+
+    // Run the numeric diff with the selected options
     NumericDiff diff(file1, file2, tolerance, threshold, side_by_side, comment_char, line_length, suppress_common_lines, only_equal, quiet);
     diff.run();
 

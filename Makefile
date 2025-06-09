@@ -1,29 +1,80 @@
 # Makefile
+# -------------------------------------------------------------
+# Top-level Makefile for the diff-numerics project.
+#
+# Provides convenient targets for building, installing, uninstalling,
+# and testing the project using CMake and Make.
+#
+# Main targets:
+#   all        - Build the project
+#   install    - Install the binary, headers, and man page
+#   uninstall  - Remove installed files
+#   test       - Run the test suite using CTest
+#   clean      - Remove build artifacts
+# -------------------------------------------------------------
 
+# Directories for build and binary files
 BUILD_DIR := build
 BIN_DIR := bin
 
+# CMake and Make commands
 CMAKE := cmake
 MAKE := make
 
-.PHONY: all clean install install-manual
+# Phony targets that do not correspond to files
+.PHONY: all clean install install-manual uninstall uninstall-cmake help
 
+# Default target: build everything
 all: $(BIN_DIR) $(BUILD_DIR)
-	cd $(BUILD_DIR) && $(MAKE)
+	cd $(BUILD_DIR) && $(MAKE) -j
 
+# Create binary directory if it doesn't exist
 $(BIN_DIR):
 	mkdir -p $(BIN_DIR)
 
+# Configure project and create build directory
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 	cd $(BUILD_DIR) && $(CMAKE) ..
 
+# Remove build and bin directories
 clean:
 	rm -rf $(BUILD_DIR) $(BIN_DIR)
 
+# Configure Release and install binary/man page
 install:
-	cmake --install build
+	cd $(BUILD_DIR) && $(CMAKE) -DCMAKE_BUILD_TYPE=Release ..
+	$(CMAKE) --install $(BUILD_DIR)
 
+# Manual install of binary and man page to /usr/local
 install-manual:
 	install -Dm755 bin/diff_numerics /usr/local/bin/diff_numerics
 	install -Dm644 diff_numerics.1 /usr/local/share/man/man1/diff_numerics.1
+
+# Remove installed binary and man page (manual)
+uninstall:
+	@echo "Uninstalling diff_numerics and man page..."
+	rm -f /usr/local/bin/diff_numerics
+	rm -f /usr/local/share/man/man1/diff_numerics.1
+	mandb
+
+# Remove installed files using CMake script
+uninstall-cmake:
+	cmake -P cmake_uninstall.cmake
+
+# Build and run all tests (with output)
+test: $(BUILD_DIR)
+	cd $(BUILD_DIR) && $(CMAKE) -DCMAKE_BUILD_TYPE=Debug ..
+	cd $(BUILD_DIR) && $(MAKE) && ctest --output-on-failure
+
+# Show available targets and their descriptions
+help:
+	@echo "Available targets:"
+	@echo "  all              - Build the project (default: Debug)"
+	@echo "  install          - Configure Release and install binary/man page (recommended)"
+	@echo "  install-manual   - Manual install of binary and man page to /usr/local"
+	@echo "  uninstall        - Remove installed binary and man page (manual)"
+	@echo "  uninstall-cmake  - Remove installed files using CMake script"
+	@echo "  test             - Build and run all tests (with output)"
+	@echo "  clean            - Remove build and bin directories"
+	@echo "  help             - Show this help message"

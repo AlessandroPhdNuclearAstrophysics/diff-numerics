@@ -1,4 +1,17 @@
-#include "../../headers/libs/NumericDiff.h"
+// NumericDiff.cpp
+// -------------------------------------------------------------
+// This file implements the NumericDiff class, which compares two numerical
+// data files line by line, with configurable tolerance, threshold, and output
+// options. It provides the core logic for the diff-numerics tool.
+//
+// Key features:
+// - Compares files line by line, token by token
+// - Supports side-by-side and diff-style output
+// - Highlights differences above a given tolerance
+// - Handles comments, column widths, and summary statistics
+// -------------------------------------------------------------
+
+#include "../include/diff_numerics/NumericDiff.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -8,9 +21,11 @@
 #include <numeric>
 #include <iomanip> // For std::setw
 
+// Constructor: initialize all options and file paths
 NumericDiff::NumericDiff(const std::string& file1, const std::string& file2, double tol, double threshold, bool side_by_side, const std::string& comment_char, int line_length, bool suppress_common_lines, bool only_equal, bool quiet)
     : file1_(file1), file2_(file2), tol_(tol), threshold_(threshold), side_by_side_(side_by_side), comment_char_(comment_char), line_length_(line_length), suppress_common_lines_(suppress_common_lines), only_equal_(only_equal), quiet_(quiet), diff_lines_(0), max_percentage_error_(0.0) {}
 
+// Main entry: run the comparison and print results
 void NumericDiff::run() {
     diff_lines_ = 0;
     max_percentage_error_ = 0.0;
@@ -64,6 +79,7 @@ void NumericDiff::run() {
     }
 }
 
+// Helper: count columns in a file (used for formatting)
 uint NumericDiff::filesColumns(const std::string& file) const {
     std::ifstream fin(file);
     if (!fin.is_open()) return 0;
@@ -76,33 +92,48 @@ uint NumericDiff::filesColumns(const std::string& file) const {
     return count;
 }
 
-
-
+// Helper: check if a string is numeric
 bool NumericDiff::isNumeric(const std::string& str) const {
     char* end = nullptr;
     std::strtod(str.c_str(), &end);
     return end != str.c_str() && *end == '\0';
 }
 
-void NumericDiff::compareLine(const std::string& line1, const std::string& line2) const {
-    std::istringstream iss1(line1), iss2(line2);
-    std::vector<std::string> tokens1, tokens2, output1, output2, errors;
+// Helper: tokenize a line into a vector of strings
+static std::vector<std::string> tokenize(const std::string& line) {
+    std::istringstream iss(line);
+    std::vector<std::string> tokens;
     std::string token;
-    std::string toPrint1, toPrint2, toPrintErrors;
+    while (iss >> token) tokens.push_back(token);
+    return tokens;
+}
 
-    // Tokenize both lines
-    while (iss1 >> token) tokens1.push_back(token);
-    while (iss2 >> token) tokens2.push_back(token);
-
-    size_t n = std::min(tokens1.size(), tokens2.size());
+// Helper: calculate column widths for side-by-side output
+static std::vector<size_t> calc_col_widths(const std::vector<std::string>& t1, const std::vector<std::string>& t2) {
+    size_t n = std::min(t1.size(), t2.size());
     std::vector<size_t> col_widths(n, 0);
     for (size_t i = 0; i < n; ++i) {
-        col_widths[i] = std::max(tokens1[i].size(), tokens2[i].size());
+        col_widths[i] = std::max(t1[i].size(), t2[i].size());
     }
+    return col_widths;
+}
+
+// Compare two lines, print differences according to options
+void NumericDiff::compareLine(const std::string& line1, const std::string& line2) const {
+    // Tokenize both lines
+    std::vector<std::string> tokens1 = tokenize(line1);
+    std::vector<std::string> tokens2 = tokenize(line2);
+    std::vector<std::string> output1, output2, errors;
+    std::string toPrint1, toPrint2, toPrintErrors;
+
+    // Calculate column widths for pretty output
+    std::vector<size_t> col_widths = calc_col_widths(tokens1, tokens2);
+    size_t n = col_widths.size();
 
     bool any_error = false;
     double max_diff_this_line = 0.0;
     for (size_t i = 0; i < n; ++i) {
+        // Compare only if both tokens are numeric
         if (isNumeric(tokens1[i]) && isNumeric(tokens2[i])) {
             double v1 = std::stod(tokens1[i]);
             double v2 = std::stod(tokens2[i]);
@@ -114,6 +145,7 @@ void NumericDiff::compareLine(const std::string& line1, const std::string& line2
                 printRed(tokens2[i]);
                 output1.push_back(tokens1[i]);
                 output2.push_back(tokens2[i]);
+                // Format the error column with right alignment
                 std::ostringstream oss;
                 oss << std::setw(static_cast<int>(col_widths[i])) << std::setfill(' ') << std::right << diff << "%";
                 errors.push_back(oss.str());
@@ -123,18 +155,25 @@ void NumericDiff::compareLine(const std::string& line1, const std::string& line2
                 errors.push_back(std::string(col_widths[i], ' '));
             }
         } else {
+            // Non-numeric tokens are just copied
             output1.push_back(tokens1[i]);
             output2.push_back(tokens2[i]);
             errors.push_back(std::string(col_widths[i], ' '));
         }
     }
 
-    toPrint1 = std::accumulate(output1.begin(), output1.end(), std::string(),
-                               [](const std::string& a, const std::string& b) { return a.empty() ? b : a + " " + b; });
-    toPrint2 = std::accumulate(output2.begin(), output2.end(), std::string(),
-                               [](const std::string& a, const std::string& b) { return a.empty() ? b : a + " " + b; });
-    toPrintErrors = std::accumulate(errors.begin(), errors.end(), std::string(),
-                               [](const std::string& a, const std::string& b) { return a.empty() ? b : a + " " + b; });
+    // Join tokens for output
+    auto join = [](const std::vector<std::string>& v) {
+        std::string out;
+        for (size_t i = 0; i < v.size(); ++i) {
+            if (i > 0) out += " ";
+            out += v[i];
+        }
+        return out;
+    };
+    toPrint1 = join(output1);
+    toPrint2 = join(output2);
+    toPrintErrors = join(errors);
 
     if (any_error) {
         ++diff_lines_;
@@ -157,6 +196,7 @@ void NumericDiff::compareLine(const std::string& line1, const std::string& line2
     }
 }
 
+// Calculate the percentage difference between two values
 double NumericDiff::percentageDifference(double value1, double value2) const {
     if (std::abs(value1) < threshold_ && std::abs(value2) < threshold_) {
         return 0.0;
@@ -273,8 +313,9 @@ void NumericDiff::printSideBySide(const std::string& line1, const std::string& l
     printSideBySide(line1, line2, true);
 }
 
+// Print differences in a diff-like format
 void NumericDiff::printDiff(const std::string& output1, const std::string& output2, const std::string& errors) const {
-    // Print only the line that contains red marks, otherwise print nothing
+    // Only print lines that contain red marks (i.e., differences)
     bool has_red1 = output1.find("\033[31m") != std::string::npos;
     bool has_red2 = output2.find("\033[31m") != std::string::npos;
     if (has_red1 || has_red2) {
