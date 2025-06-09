@@ -1,8 +1,8 @@
-.TH diff_numerics 1 "June 2025" "diff-numerics"
+.TH diff-numerics 1 "June 2025" "diff-numerics"
 .SH NAME
-diff_numerics \- compare numerical data files with tolerance
+diff-numerics \- compare numerical data files with tolerance
 .SH SYNOPSIS
-.B diff_numerics
+.B diff-numerics
 [options] file1 file2
 .SH DESCRIPTION
 A command-line tool for comparing numerical data files with configurable tolerance, threshold, and output formatting. Designed for scientific and engineering workflows where small floating-point differences are expected.
@@ -36,13 +36,13 @@ Suppress all output if files are equal within tolerance.
 .SH EXAMPLES
 .TP
 Compare two files with default settings:
-.B diff_numerics file1.dat file2.dat
+.B diff-numerics file1.dat file2.dat
 .TP
 Side-by-side comparison with custom tolerance:
-.B diff_numerics -y -t 0.01 file1.dat file2.dat
+.B diff-numerics -y -t 0.01 file1.dat file2.dat
 
 .SH AUTHOR
-Written by Alessandro (2025).
+Written by Alessandro Grassi (2025).
 
 .SH LICENSE
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
