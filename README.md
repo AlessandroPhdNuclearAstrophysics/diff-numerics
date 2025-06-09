@@ -53,6 +53,22 @@ sudo cmake --install build
 - Tests are written with GoogleTest and located in `test/test_diff_numerics.cpp`.
 - Test data files are in `test/`.
 - Run `make test` or `ctest` from the build directory to execute all tests.
+- To run a specific test case or see verbose output, use:
+
+```sh
+cd build
+./bin/diff_numerics_tests --gtest_filter=DiffNumerics.*
+```
+
+- To manually check the CLI output for a specific test case (e.g., for the 3P2-3F2 files):
+
+```sh
+./bin/diff_numerics test/delta_3P2-3F2.dat test/delta_3P2-3F2_2.dat
+./bin/diff_numerics -y test/delta_3P2-3F2.dat test/delta_3P2-3F2_2.dat
+./bin/diff_numerics -s test/delta_3P2-3F2.dat test/delta_3P2-3F2_2.dat
+```
+
+- The test suite covers all main diff-numerics modes (default, tight tolerance, side-by-side, suppress common lines, quiet, CLI summary) and asserts on output patterns for robust coverage.
 
 ---
 
