@@ -33,8 +33,8 @@ file(GLOB SOURCES "src/*.cpp" "src/libs/*.cpp")
 file(GLOB HEADERS "include/diff_numerics/*.h")
 
 # Main executable target
-add_executable(diff_numerics ${SOURCES})
-target_compile_options(diff_numerics PRIVATE
+add_executable(diff-numerics ${SOURCES})
+target_compile_options(diff-numerics PRIVATE
     -Wall -Wextra -Wpedantic -Wshadow
     -Wconversion -Wsign-conversion -Wfloat-equal
     -fPIC
@@ -44,7 +44,7 @@ target_compile_options(diff_numerics PRIVATE
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Install rules for binary, man page, and headers
-install(TARGETS diff_numerics DESTINATION bin)
+install(TARGETS diff-numerics DESTINATION bin)
 install(FILES ${CMAKE_SOURCE_DIR}/diff_numerics.1 DESTINATION share/man/man1)
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/diff_numerics DESTINATION include)
 

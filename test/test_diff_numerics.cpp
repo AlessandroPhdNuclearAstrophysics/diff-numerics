@@ -60,7 +60,7 @@ std::string run_diff_numerics_cli(const std::string& args) {
     std::array<char, 256> buffer;
     std::string result;
     // Use absolute path to binary and test data
-    std::string bin = project_root() + "/build/diff_numerics";
+    std::string bin = project_root() + "/build/diff-numerics";
     std::string cmd = bin + " " + args + " 2>&1";
     std::cout << "[TEST] Running CLI: " << cmd << std::endl;
     std::unique_ptr<FILE, int(*)(FILE*)> pipe(popen(cmd.c_str(), "r"), pclose);

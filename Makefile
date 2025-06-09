@@ -15,7 +15,6 @@
 
 # Directories for build and binary files
 BUILD_DIR := build
-BIN_DIR := bin
 
 # CMake and Make commands
 CMAKE := cmake
@@ -25,12 +24,8 @@ MAKE := make
 .PHONY: all clean install install-manual uninstall uninstall-cmake help
 
 # Default target: build everything
-all: $(BIN_DIR) $(BUILD_DIR)
+all: $(BUILD_DIR)
 	cd $(BUILD_DIR) && $(MAKE) -j
-
-# Create binary directory if it doesn't exist
-$(BIN_DIR):
-	mkdir -p $(BIN_DIR)
 
 # Configure project and create build directory
 $(BUILD_DIR):
