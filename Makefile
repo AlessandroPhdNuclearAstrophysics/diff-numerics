@@ -37,7 +37,7 @@ clean:
 	rm -rf $(BUILD_DIR) $(BIN_DIR)
 
 # Configure Release and install binary/man page
-install: all
+install:
 	cd $(BUILD_DIR) && $(CMAKE) -DCMAKE_BUILD_TYPE=Release ..
 	$(CMAKE) --install $(BUILD_DIR)
 
