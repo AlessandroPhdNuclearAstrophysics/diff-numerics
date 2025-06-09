@@ -1,3 +1,5 @@
 test*
 *.dat
 build/*
+.vscode/*
+.gitignore
