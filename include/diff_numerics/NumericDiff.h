@@ -59,7 +59,6 @@ private:
     void compareValues(double value1, double value2) const;
     // Print diff output in various formats
     void printDiff(const std::string& line1, const std::string& line2, const std::string& errors) const;
-    void printSideBySide(const std::string& line1, const std::string& line2) const;
     // Print side-by-side tokens, aligning columns. Never truncate or cut numeric values: if a value is longer than the max column width, the column expands to fit the value. The max column width only limits padding/alignment, not the content of the numbers. ANSI color codes are ignored for width calculations.
     void printSideBySideTokens(const std::vector<std::string>& tokens1, const std::vector<std::string>& tokens2, const std::vector<size_t>& col_widths) const;
     // Print a string in red (for errors)

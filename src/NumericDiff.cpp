@@ -325,36 +325,6 @@ std::string NumericDiff::extractVisiblePrefix(const std::string& input, size_t n
     return result;
 }
 
-// Overload printSideBySide to accept any_error
-void NumericDiff::printSideBySide(const std::string& line1, const std::string& line2) const {
-    int width = line_length_;
-    std::string l1 = line1, l2 = line2;
-    std::string l1_plain = stripAnsi(l1);
-    std::string l2_plain = stripAnsi(l2);
-    int len1 = static_cast<int>(l1_plain.size());
-    int len2 = static_cast<int>(l2_plain.size());
-
-    // Truncate or pad l1
-    if (len1 > width) {
-        l1 = extractVisiblePrefix(l1, static_cast<size_t>(width));
-    } else if (len1 < width) {
-        l1 += std::string(static_cast<std::string::size_type>(width - len1), ' ');
-    }
-
-    // Truncate or pad l2
-    if (len2 > width) {
-        l2 = extractVisiblePrefix(l2, static_cast<size_t>(width));
-    } else if (len2 < width) {
-        l2 += std::string(static_cast<std::string::size_type>(width - len2), ' ');
-    }
-    std::cout << l2.size() << " " << l1.size() << "\n";
-
-    // Decide separator: if both lines have no red color, use space, else use " | "
-    bool has_red = (line1.find("\033[31m") != std::string::npos) || (line2.find("\033[31m") != std::string::npos);
-    const char* sep = has_red ? "   |   " : "       ";
-    std::cout << l1 << sep << l2 << "\n";
-}
-
 // Print differences in a diff-like format
 void NumericDiff::printDiff(const std::string& output1, const std::string& output2, const std::string& errors) const {
     // Only print lines that contain red marks (i.e., differences)
