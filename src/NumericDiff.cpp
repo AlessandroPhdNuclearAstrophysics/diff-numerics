@@ -140,6 +140,7 @@ void NumericDiff::compareLine(const std::string& line1, const std::string& line2
     std::vector<std::string> tokens1 = tokenize(line1);
     std::vector<std::string> tokens2 = tokenize(line2);
     std::vector<std::string> output1, output2, errors;
+    std::vector<bool> is_diff;
     std::string toPrint1, toPrint2, toPrintErrors;
 
     // Calculate column widths for pretty output
@@ -157,10 +158,13 @@ void NumericDiff::compareLine(const std::string& line1, const std::string& line2
             if (std::abs(diff) > tol_) {
                 any_error = true;
                 if (std::abs(diff) > max_diff_this_line) max_diff_this_line = std::abs(diff);
-                printRed(tokens1[i]);
-                printRed(tokens2[i]);
-                output1.push_back(tokens1[i]);
-                output2.push_back(tokens2[i]);
+                std::string t1 = tokens1[i];
+                std::string t2 = tokens2[i];
+                printRed(t1);
+                printRed(t2);
+                output1.push_back(t1);
+                output2.push_back(t2);
+                is_diff.push_back(true);
                 // Format the error column with right alignment
                 std::ostringstream oss;
                 oss << std::setw(static_cast<int>(col_widths[i])) << std::setfill(' ') << std::right << diff << "%";
@@ -168,28 +172,17 @@ void NumericDiff::compareLine(const std::string& line1, const std::string& line2
             } else {
                 output1.push_back(tokens1[i]);
                 output2.push_back(tokens2[i]);
+                is_diff.push_back(false);
                 errors.push_back(std::string(col_widths[i], ' '));
             }
         } else {
             // Non-numeric tokens are just copied
             output1.push_back(tokens1[i]);
             output2.push_back(tokens2[i]);
+            is_diff.push_back(false);
             errors.push_back(std::string(col_widths[i], ' '));
         }
     }
-
-    // Join tokens for output
-    auto join = [](const std::vector<std::string>& v) {
-        std::string out;
-        for (size_t i = 0; i < v.size(); ++i) {
-            if (i > 0) out += " ";
-            out += v[i];
-        }
-        return out;
-    };
-    toPrint1 = join(output1);
-    toPrint2 = join(output2);
-    toPrintErrors = join(errors);
 
     if (any_error) {
         ++diff_lines_;
@@ -205,15 +198,64 @@ void NumericDiff::compareLine(const std::string& line1, const std::string& line2
     if (side_by_side_) {
         if (suppress_common_lines_) {
             if (any_error) {
-                printSideBySide(toPrint1, toPrint2);
+                // Print tokens side by side, column by column
+                printSideBySideTokens(output1, output2, col_widths);
             }
             // else: do not print common lines
         } else {
-            printSideBySide(toPrint1, toPrint2);
+            printSideBySideTokens(output1, output2, col_widths);
         }
     } else {
+        // Join tokens for output
+        auto join = [](const std::vector<std::string>& v) {
+            std::string out;
+            for (size_t i = 0; i < v.size(); ++i) {
+                if (i > 0) out += " ";
+                out += v[i];
+            }
+            return out;
+        };
+        toPrint1 = join(output1);
+        toPrint2 = join(output2);
+        toPrintErrors = join(errors);
         printDiff(toPrint1, toPrint2, toPrintErrors);
     }
+}
+
+// New helper: print tokens side by side, column by column, with color and padding
+void NumericDiff::printSideBySideTokens(const std::vector<std::string>& tokens1, const std::vector<std::string>& tokens2, const std::vector<size_t>& col_widths) const {
+    // Print tokens side by side, aligning columns. Never truncate or cut numeric values: if a value is longer than the max column width, the column expands to fit the value. The max column width only limits padding/alignment, not the content of the numbers. ANSI color codes are ignored for width calculations.
+    std::ostringstream oss1, oss2;
+    size_t ncols = std::max(tokens1.size(), tokens2.size());
+    for (size_t i = 0; i < ncols; ++i) {
+        std::string t1 = (i < tokens1.size()) ? tokens1[i] : "";
+        std::string t2 = (i < tokens2.size()) ? tokens2[i] : "";
+        std::string t1_stripped = stripAnsi(t1);
+        std::string t2_stripped = stripAnsi(t2);
+        // Determine the width for this column: max of user col_width and actual token width
+        size_t colw = (i < col_widths.size()) ? col_widths[i] : static_cast<size_t>(line_length_);
+        colw = std::max({colw, t1_stripped.size(), t2_stripped.size()});
+        // Print first token, padded
+        oss1 << t1;
+        if (t1_stripped.size() < colw)
+            oss1 << std::string(colw - t1_stripped.size(), ' ');
+        // Print second token, padded
+        oss2 << t2;
+        if (t2_stripped.size() < colw)
+            oss2 << std::string(colw - t2_stripped.size(), ' ');
+        if (i + 1 < ncols) {
+            oss1 << " ";
+            oss2 << " ";
+        }
+    }
+    std::string l1 = oss1.str();
+    std::string l2 = oss2.str();
+    // Decide separator: if either line has red color, use |, else use spaces
+    bool has_red = (l1.find("\033[31m") != std::string::npos) || (l2.find("\033[31m") != std::string::npos);
+    const char* sep = has_red ? "   |   " : "       ";
+    l1 = extractVisiblePrefix(l1, static_cast<size_t>(line_length_));
+    l2 = extractVisiblePrefix(l2, static_cast<size_t>(line_length_));
+    std::cout << l1 << sep << l2 << "\n";
 }
 
 // Calculate the percentage difference between two values
@@ -253,6 +295,36 @@ std::string NumericDiff::stripAnsi(const std::string& input) const {
     return result;
 }
 
+// Extract the first n visible (non-ANSI) characters from a string, preserving formatting codes
+std::string NumericDiff::extractVisiblePrefix(const std::string& input, size_t n) const {
+    std::string result;
+    size_t visible_count = 0;
+    bool in_escape = false;
+    for (size_t i = 0; i < input.size(); ++i) {
+        if (!in_escape) {
+            if (input[i] == '\033' && i + 1 < input.size() && input[i + 1] == '[') {
+                in_escape = true;
+                result += input[i];
+            } else {
+                if (visible_count < n) {
+                    result += input[i];
+                    ++visible_count;
+                } else {
+                    break;
+                }
+            }
+        } else {
+            result += input[i];
+            if (input[i] == 'm') {
+                in_escape = false;
+            }
+        }
+    }
+    // Ensure the result ends with a reset code if it was in an escape sequence
+    ensureAnsiReset(result);
+    return result;
+}
+
 // Overload printSideBySide to accept any_error
 void NumericDiff::printSideBySide(const std::string& line1, const std::string& line2) const {
     int width = line_length_;
@@ -264,62 +336,21 @@ void NumericDiff::printSideBySide(const std::string& line1, const std::string& l
 
     // Truncate or pad l1
     if (len1 > width) {
-        int count = 0;
-        std::string out;
-        bool in_escape = false;
-        for (size_t i = 0; i < l1.size(); ++i) {
-            if (!in_escape) {
-                if (l1[i] == '\033' && i + 1 < l1.size() && l1[i + 1] == '[') {
-                    in_escape = true;
-                    out += l1[i];
-                } else if (count < width) {
-                    out += l1[i];
-                    ++count;
-                } else {
-                    break;
-                }
-            } else {
-                out += l1[i];
-                if (l1[i] == 'm') {
-                    in_escape = false;
-                }
-            }
-        }
-        l1 = out;
+        l1 = extractVisiblePrefix(l1, static_cast<size_t>(width));
     } else if (len1 < width) {
         l1 += std::string(static_cast<std::string::size_type>(width - len1), ' ');
     }
 
     // Truncate or pad l2
     if (len2 > width) {
-        int count = 0;
-        std::string out;
-        bool in_escape = false;
-        for (size_t i = 0; i < l2.size(); ++i) {
-            if (!in_escape) {
-                if (l2[i] == '\033' && i + 1 < l2.size() && l2[i + 1] == '[') {
-                    in_escape = true;
-                    out += l2[i];
-                } else if (count < width) {
-                    out += l2[i];
-                    ++count;
-                } else {
-                    break;
-                }
-            } else {
-                out += l2[i];
-                if (l2[i] == 'm') {
-                    in_escape = false;
-                }
-            }
-        }
-        l2 = out;
+        l2 = extractVisiblePrefix(l2, static_cast<size_t>(width));
     } else if (len2 < width) {
         l2 += std::string(static_cast<std::string::size_type>(width - len2), ' ');
     }
+    std::cout << l2.size() << " " << l1.size() << "\n";
 
     // Decide separator: if both lines have no red color, use space, else use " | "
-    bool has_red = (l1.find("\033[31m") != std::string::npos) || (l2.find("\033[31m") != std::string::npos);
+    bool has_red = (line1.find("\033[31m") != std::string::npos) || (line2.find("\033[31m") != std::string::npos);
     const char* sep = has_red ? "   |   " : "       ";
     std::cout << l1 << sep << l2 << "\n";
 }
@@ -334,5 +365,18 @@ void NumericDiff::printDiff(const std::string& output1, const std::string& outpu
         std::cout << "< " << output1 << "\n";
         std::cout << "> " << output2 << "\n";
         std::cout << ">>" << errors << "\n";
+    }
+}
+
+// Ensure the string ends with the ANSI reset code if the last color set is not reset
+void NumericDiff::ensureAnsiReset(std::string& str) const {
+    // Only handle red for now: \033[31m ... \033[0m
+    // If the string contains a red start but does not end with reset, add reset
+    const std::string red_start = "\033[31m";
+    const std::string reset = "\033[0m";
+    size_t last_red = str.rfind(red_start);
+    size_t last_reset = str.rfind(reset);
+    if (last_red != std::string::npos && (last_reset == std::string::npos || last_reset < last_red)) {
+        str += reset;
     }
 }

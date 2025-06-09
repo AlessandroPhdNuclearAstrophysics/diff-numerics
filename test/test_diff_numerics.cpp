@@ -155,4 +155,66 @@ TEST(DiffNumericsCLI, MissingFileError) {
     EXPECT_NE(out.find("Error: Two input files must be specified."), std::string::npos);
 }
 
+// --- Tests for delta_3P2-3F2.dat and delta_3P2-3F2_2.dat ---
+
+// Test: Default tolerance, files should be different (output should not be empty and show differences in all columns)
+TEST(DiffNumerics, P2F2_DifferentFilesDefaultTolerance) {
+    std::string file1 = test_data_path("delta_3P2-3F2.dat");
+    std::string file2 = test_data_path("delta_3P2-3F2_2.dat");
+    std::string output = run_diff(file1, file2, 1E-2, 1E-6, false, false, false, false);
+    std::cout << "[TEST] P2F2 DefaultTolerance: file1=" << file1 << ", file2=" << file2 << "\nOutput:\n" << output << std::endl;
+    EXPECT_FALSE(output.empty());
+    EXPECT_NE(output.find("1e+99%"), std::string::npos); // Should show large percent diff for some columns
+    EXPECT_NE(output.find("< 0.465"), std::string::npos); // Should show diff lines
+}
+
+// Test: Tight tolerance, files should still be different
+TEST(DiffNumerics, P2F2_DifferentFilesTightTolerance) {
+    std::string file1 = test_data_path("delta_3P2-3F2.dat");
+    std::string file2 = test_data_path("delta_3P2-3F2_2.dat");
+    std::string output = run_diff(file1, file2, 1E-10, 1E-12, false, false, false, false);
+    std::cout << "[TEST] P2F2 TightTolerance: file1=" << file1 << ", file2=" << file2 << "\nOutput:\n" << output << std::endl;
+    EXPECT_FALSE(output.empty());
+    EXPECT_NE(output.find("< 0.465"), std::string::npos);
+}
+
+// Test: Side-by-side output mode
+TEST(DiffNumerics, P2F2_SideBySideOutput) {
+    std::string file1 = test_data_path("delta_3P2-3F2.dat");
+    std::string file2 = test_data_path("delta_3P2-3F2_2.dat");
+    std::string output = run_diff(file1, file2, 1E-2, 1E-6, true, false, false, false);
+    std::cout << "[TEST] P2F2 SideBySide: file1=" << file1 << ", file2=" << file2 << "\nOutput:\n" << output << std::endl;
+    EXPECT_FALSE(output.empty());
+    EXPECT_NE(output.find("|"), std::string::npos); // Side-by-side separator
+    EXPECT_NE(output.find("0.465"), std::string::npos); // Should show a known differing value
+}
+
+// Test: Suppress common lines in output
+TEST(DiffNumerics, P2F2_SuppressCommonLines) {
+    std::string file1 = test_data_path("delta_3P2-3F2.dat");
+    std::string file2 = test_data_path("delta_3P2-3F2_2.dat");
+    std::string output = run_diff(file1, file2, 1E-2, 1E-6, true, true, false, false);
+    std::cout << "[TEST] P2F2 SuppressCommonLines: file1=" << file1 << ", file2=" << file2 << "\nOutput:\n" << output << std::endl;
+    EXPECT_FALSE(output.empty());
+    EXPECT_NE(output.find("|"), std::string::npos);
+}
+
+// Test: Quiet mode
+TEST(DiffNumerics, P2F2_QuietMode) {
+    std::string file1 = test_data_path("delta_3P2-3F2.dat");
+    std::string file2 = test_data_path("delta_3P2-3F2_2.dat");
+    std::string output = run_diff(file1, file2, 1E-2, 1E-6, false, false, false, true);
+    std::cout << "[TEST] P2F2 QuietMode: file1=" << file1 << ", file2=" << file2 << "\nOutput:\n" << output << std::endl;
+    EXPECT_FALSE(output.empty());
+}
+
+// Test: CLI summary output for these files
+TEST(DiffNumericsCLI, P2F2_CLISummary) {
+    std::string args = test_data_path("delta_3P2-3F2.dat") + " " + test_data_path("delta_3P2-3F2_2.dat");
+    std::string out = run_diff_numerics_cli(args);
+    std::cout << "[TEST] P2F2 CLI Output: " << out << std::endl;
+    EXPECT_NE(out.find("Files DIFFER"), std::string::npos);
+    EXPECT_NE(out.find("max percentage error"), std::string::npos);
+}
+
 // Add more tests for different tolerances, thresholds, and options as needed

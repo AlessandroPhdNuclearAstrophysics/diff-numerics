@@ -9,6 +9,7 @@
 
 #pragma once
 #include <string>
+#include <vector>
 
 class NumericDiff {
 public:
@@ -59,6 +60,8 @@ private:
     // Print diff output in various formats
     void printDiff(const std::string& line1, const std::string& line2, const std::string& errors) const;
     void printSideBySide(const std::string& line1, const std::string& line2) const;
+    // Print side-by-side tokens, aligning columns. Never truncate or cut numeric values: if a value is longer than the max column width, the column expands to fit the value. The max column width only limits padding/alignment, not the content of the numbers. ANSI color codes are ignored for width calculations.
+    void printSideBySideTokens(const std::vector<std::string>& tokens1, const std::vector<std::string>& tokens2, const std::vector<size_t>& col_widths) const;
     // Print a string in red (for errors)
     inline void printRed(std::string& str) const {
         // Placeholder for red text output, e.g., using ANSI escape codes
@@ -66,6 +69,10 @@ private:
     }
     // Remove ANSI color codes from a string
     std::string stripAnsi(const std::string& input) const;
+    // Extract the first n visible (non-ANSI) characters from a string, preserving formatting codes
+    std::string extractVisiblePrefix(const std::string& input, size_t n) const;
+    // Ensure the string ends with the ANSI reset code if the last color set is not reset
+    void ensureAnsiReset(std::string& str) const;
 
     // For summary/statistics
     mutable size_t diff_lines_ = 0;
