@@ -46,7 +46,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # Install rules for binary, man page, and headers
 install(TARGETS diff-numerics DESTINATION bin)
 install(FILES ${CMAKE_SOURCE_DIR}/diff-numerics.1 DESTINATION share/man/man1)
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/diff_numerics DESTINATION include)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/diff-numerics DESTINATION include)
 
 # Enable testing and add GoogleTest for tests
 include(CTest)

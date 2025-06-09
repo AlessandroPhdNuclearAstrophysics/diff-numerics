@@ -18,7 +18,7 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 add_executable(diff-numerics-tests
-    ${CMAKE_SOURCE_DIR}/test/test_diff_numerics.cpp
+    ${CMAKE_SOURCE_DIR}/test/test-diff-numerics.cpp
     ${CMAKE_SOURCE_DIR}/src/NumericDiff.cpp
 )
 target_include_directories(diff-numerics-tests PRIVATE ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/include/diff-numerics)
