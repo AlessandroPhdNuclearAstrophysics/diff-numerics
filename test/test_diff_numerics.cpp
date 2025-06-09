@@ -9,7 +9,7 @@
 // -------------------------------------------------------------
 
 #include <gtest/gtest.h>
-#include "diff_numerics/NumericDiff.h"
+#include "diff-numerics/NumericDiff.h"
 #include <fstream>
 #include <filesystem>
 #include <cstdio>

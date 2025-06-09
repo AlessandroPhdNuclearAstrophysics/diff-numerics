@@ -11,7 +11,7 @@
 // - Handles comments, column widths, and summary statistics
 // -------------------------------------------------------------
 
-#include "../include/diff_numerics/NumericDiff.h"
+#include "../include/diff-numerics/NumericDiff.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>

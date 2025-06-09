@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 #include <cstdlib>
-#include "diff_numerics/NumericDiff.h"
+#include "diff-numerics/NumericDiff.h"
 
 int main(int argc, char* argv[]) {
     // Option variables with defaults
