@@ -43,14 +43,14 @@ install: all
 
 # Manual install of binary and man page to /usr/local
 install-manual:
-	install -Dm755 bin/diff_numerics /usr/local/bin/diff_numerics
-	install -Dm644 diff_numerics.1 /usr/local/share/man/man1/diff_numerics.1
+	install -Dm755 bin/diff-numerics /usr/local/bin/diff-numerics
+	install -Dm644 diff-numerics.1 /usr/local/share/man/man1/diff-numerics.1
 
 # Remove installed binary and man page (manual)
 uninstall:
-	@echo "Uninstalling diff_numerics and man page..."
-	rm -f /usr/local/bin/diff_numerics
-	rm -f /usr/local/share/man/man1/diff_numerics.1
+	@echo "Uninstalling diff-numerics and man page..."
+	rm -f /usr/local/bin/diff-numerics
+	rm -f /usr/local/share/man/man1/diff-numerics.1
 	mandb
 
 # Remove installed files using CMake script

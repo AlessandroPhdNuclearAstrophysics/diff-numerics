@@ -11,7 +11,7 @@
 
 cmake_minimum_required(VERSION 3.10)
 
-project(DIFF_NUMERICS
+project(diff-numerics
     VERSION 1.0
     DESCRIPTION "A C++ project for numerical diff between two files"
     LANGUAGES CXX)
@@ -26,7 +26,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 
 # Include directories for headers
 include_directories(include)
-include_directories(include/diff_numerics)
+include_directories(include/diff-numerics)
 
 # Gather source and header files
 file(GLOB SOURCES "src/*.cpp" "src/libs/*.cpp")
@@ -45,8 +45,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Install rules for binary, man page, and headers
 install(TARGETS diff-numerics DESTINATION bin)
-install(FILES ${CMAKE_SOURCE_DIR}/diff_numerics.1 DESTINATION share/man/man1)
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/diff_numerics DESTINATION include)
+install(FILES ${CMAKE_SOURCE_DIR}/diff-numerics.1 DESTINATION share/man/man1)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/diff-numerics DESTINATION include)
 
 # Enable testing and add GoogleTest for tests
 include(CTest)

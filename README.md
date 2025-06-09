@@ -5,23 +5,23 @@
 
 `diff-numerics` is a professional C++ tool for comparing numerical data files with configurable tolerance, threshold, and output options. It is designed for scientific and engineering workflows where precise numerical comparison is required.
 
-- **Source code:** See `src/` and `include/diff_numerics/`
+- **Source code:** See `src/` and `include/diff-numerics/`
 - **Tests:** See `test/` (uses GoogleTest)
 - **Build system:** CMake and Makefile (see below)
-- **Documentation:** Man page (`diff_numerics.1`), this README, and code comments
+- **Documentation:** Man page (`diff-numerics.1`), this README, and code comments
 
 ---
 
 ## Project Structure
 
 - `src/` - Main source files for the diff-numerics tool
-- `include/diff_numerics/` - Public headers (notably `NumericDiff.h`)
+- `include/diff-numerics/` - Public headers (notably `NumericDiff.h`)
 - `test/` - Test suite, test data, and test CMake configuration
 - `bin/` - Built executables
 - `build/` - CMake build directory (not in version control)
 - `Makefile` - Top-level automation for build, install, test, and clean
 - `CMakeLists.txt` - Top-level CMake configuration
-- `diff_numerics.1` - Man page for the command-line tool
+- `diff-numerics.1` - Man page for the command-line tool
 
 ---
 
@@ -50,22 +50,22 @@ sudo cmake --install build
 
 ## Testing
 
-- Tests are written with GoogleTest and located in `test/test_diff_numerics.cpp`.
+- Tests are written with GoogleTest and located in `test/test_diff-numerics.cpp`.
 - Test data files are in `test/`.
 - Run `make test` or `ctest` from the build directory to execute all tests.
 - To run a specific test case or see verbose output, use:
 
 ```sh
 cd build
-./bin/diff_numerics_tests --gtest_filter=DiffNumerics.*
+./bin/diff-numerics_tests --gtest_filter=DiffNumerics.*
 ```
 
 - To manually check the CLI output for a specific test case (e.g., for the 3P2-3F2 files):
 
 ```sh
-./bin/diff_numerics test/delta_3P2-3F2.dat test/delta_3P2-3F2_2.dat
-./bin/diff_numerics -y test/delta_3P2-3F2.dat test/delta_3P2-3F2_2.dat
-./bin/diff_numerics -s test/delta_3P2-3F2.dat test/delta_3P2-3F2_2.dat
+./bin/diff-numerics test/delta_3P2-3F2.dat test/delta_3P2-3F2_2.dat
+./bin/diff-numerics -y test/delta_3P2-3F2.dat test/delta_3P2-3F2_2.dat
+./bin/diff-numerics -s test/delta_3P2-3F2.dat test/delta_3P2-3F2_2.dat
 ```
 
 - The test suite covers all main diff-numerics modes (default, tight tolerance, side-by-side, suppress common lines, quiet, CLI summary) and asserts on output patterns for robust coverage.
@@ -83,7 +83,7 @@ cd build
 ## Documentation
 
 - The code is heavily commented for clarity and onboarding.
-- See the man page (`diff_numerics.1`) for command-line usage.
+- See the man page (`diff-numerics.1`) for command-line usage.
 - For more details, see the comments at the top of each source, header, and build file.
 
 ---
@@ -142,7 +142,7 @@ The binary will be placed in the `bin/` directory.
 ## Usage
 
 ```bash
-./bin/diff_numerics [options] file1 file2
+./bin/diff-numerics [options] file1 file2
 ```
 
 ### Options
@@ -161,7 +161,7 @@ The binary will be placed in the `bin/` directory.
 ### Example
 
 ```bash
-./bin/diff_numerics -y -t 0.01 -T 1e-5 data1.dat data2.dat
+./bin/diff-numerics -y -t 0.01 -T 1e-5 data1.dat data2.dat
 ```
 
 ---
@@ -180,7 +180,7 @@ The binary will be placed in the `bin/` directory.
 A sample test output is provided in the `test` file. You can generate your own by running:
 
 ```bash
-./bin/diff_numerics -y delta_3D2_2.dat delta_3D2.dat
+./bin/diff-numerics -y delta_3D2_2.dat delta_3D2.dat
 ```
 
 ---
