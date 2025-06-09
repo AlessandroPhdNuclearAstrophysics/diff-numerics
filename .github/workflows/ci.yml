@@ -28,6 +28,11 @@ jobs:
           cp test/*.dat build/ || true
         working-directory: ${{ github.workspace }}
 
+      - name: Run tests
+        run: |
+          make test
+        working-directory: ${{ github.workspace }}
+
       - name: Install binary and man page
         run: |
           sudo make install
