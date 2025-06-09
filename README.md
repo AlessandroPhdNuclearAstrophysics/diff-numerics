@@ -96,7 +96,8 @@ See `LICENSE` for details.
 
 ## TODO / Ideas
 
-- Realign lines whose number are different in the two files but are otherwise similar.
+- Add option to ignore columns that are zero in both files for each line.
+- Realign lines whose numbers are different in the two files but are otherwise similar.
 - Add unit tests and CI integration.
 - Support for config files.
 - Output to HTML/Markdown.
@@ -202,7 +203,6 @@ This project is licensed under the terms of the GNU General Public License v3.0.
 ## TODO / Ideas
 
 - Give the possibility to ignore the columns that for both files are zero for each line.
-- Give the possiblity to choose the columns to compare.
 - Realign lines whose number are different in the two files but are otherwise similar.
 - Support for config files.
 - Output to HTML/Markdown.
