@@ -2,6 +2,7 @@
 #pragma once
 #include <string>
 #include <set>
+#include <iostream>
 
 class NumericDiffOption {
 public:
@@ -23,8 +24,8 @@ public:
     bool validate_options() const;
     static bool parse_columns(const std::string& col_arg, std::set<size_t>& columns_to_compare, const std::string& usage);
     static const std::string usage;
+    static void print_usage();
 
-    // Missing declarations added
     bool parse(int argc, char* argv[]);
     bool validate() const;
 };

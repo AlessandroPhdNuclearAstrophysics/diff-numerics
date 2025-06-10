@@ -4,19 +4,31 @@
 #include <sstream>
 #include <cstdlib>
 
+// Define static member
 const std::string NumericDiffOption::usage =
-    "Usage: diff-numerics [options] file1 file2\n"
+    "Usage: numeric-diff [options] file1 file2\n"
     "Options:\n"
-    "  -y, --side-by-side        Print lines side by side\n"
-    "  -ys, --suppress-common-lines  Suppress lines within tolerance in side-by-side mode (implies -y)\n"
-    "  -t, --tolerance <value>   Tolerance for percentage difference (default: 1E-2)\n"
-    "  -T, --threshold <val>     Ignore if both values are under threshold (default: 1E-6)\n"
-    "  -c, --comment-string <str> String to start a comment (default: #)\n"
-    "  -w, --single-column-width <n> Set column width for side-by-side output (default: 60)\n"
-    "  -s, --report-identical-files  Print only if files are equal within tolerance, otherwise print summary\n"
-    "  -q, --quiet               Suppress all output if files are equal within tolerance\n"
-    "  -d, --color-different-digits  Colorize only the part of the numbers that differ\n"
-    "  -C, --columns <list>         Comma-separated list of columns (1-based) to compare\n";
+    "  -y,  --side-by-side             Show files side by side (default: off)\n"
+    "  -ys, --suppress-common-lines    Suppress lines that are the same (implies side-by-side, default: off)\n"
+    "  -t,  --tolerance <value>        Set tolerance for numeric comparison (default: 1e-2)\n"
+    "  -T,  --threshold <value>        Set threshold for reporting differences (default: 1e-6)\n"
+    "  -c,  --comment-string <char>    Set comment character (default: #)\n"
+    "  -w,  --single-column-width <n>  Set maximum line length (default: 60)\n"
+    "  -s,  --report-identical-files   Only show equal lines (default: off)\n"
+    "  -q,  --quiet                    Suppress output (default: off)\n"
+    "  -d,  --color-different-digits   Color differing digits (default: off)\n"
+    "  -C,  --columns <list>           Compare only specified columns (comma-separated, 1-based, default: all)\n"
+    "  -v,  --version                  Show program version and exit\n"
+    "  -h,  --help                     Show this help message\n";
+
+#ifndef NUMERIC_DIFF_VERSION
+#define NUMERIC_DIFF_VERSION "unknown"
+#endif
+
+// Implementation of print_usage
+void NumericDiffOption::print_usage() {
+    std::cout << usage << std::endl;
+}
 
 bool NumericDiffOption::parse_columns(const std::string& col_arg, std::set<size_t>& columns_to_compare, const std::string& usage) {
     std::stringstream ss(col_arg);
@@ -35,12 +47,15 @@ bool NumericDiffOption::parse_columns(const std::string& col_arg, std::set<size_
 bool NumericDiffOption::parse_args(int argc, char* argv[]) {
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
-        if (arg == "-y" || arg == "--side-by-side") {
+        if (arg == "-v" || arg == "--version") {
+            std::cout << "numeric-diff version " << NUMERIC_DIFF_VERSION << std::endl;
+            std::exit(0);
+        } else if (arg == "-y" || arg == "--side-by-side") {
             side_by_side = true;
         } else if (arg == "-ys" || arg == "--suppress-common-lines") {
             suppress_common_lines = true;
             side_by_side = true;
-        } else if ((arg == "-tol" || arg == "-tolerance" || arg == "-t" || arg == "--tolerance")) {
+        } else if ((arg == "-t" || arg == "--tolerance")) {
             if (i + 1 < argc) {
                 tolerance = std::atof(argv[++i]);
             } else {
@@ -54,7 +69,7 @@ bool NumericDiffOption::parse_args(int argc, char* argv[]) {
                 std::cerr << "Error: Missing value for " << arg << " option.\n" << usage;
                 return false;
             }
-        } else if ((arg == "-comment" || arg == "-c" || arg == "--comment-string")) {
+        } else if ((arg == "--comment" || arg == "-c" || arg == "--comment-string")) {
             if (i + 1 < argc) {
                 comment_char = argv[++i];
             } else {
@@ -68,7 +83,7 @@ bool NumericDiffOption::parse_args(int argc, char* argv[]) {
                 std::cerr << "Error: Missing value for " << arg << " option.\n" << usage;
                 return false;
             }
-        } else if (arg == "--only-equal" || arg == "-s" || arg == "--report-identical-files") {
+        } else if (arg == "--only-equal" || arg == "-s") {
             only_equal = true;
         } else if (arg == "-q" || arg == "--quiet") {
             quiet = true;

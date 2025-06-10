@@ -32,6 +32,18 @@ Print only if files are equal within tolerance, otherwise print summary.
 .TP
 .B -q, --quiet
 Suppress all output if files are equal within tolerance.
+.TP
+.B -C, --columns <list>
+Comma-separated list of 1-based column indices to compare (e.g., 1,2,4).
+.TP
+.B -d, --color-diff-digits
+Highlight only differing digits in output using ANSI colors.
+.TP
+.B -v, --version
+Show program version and exit.
+.TP
+.B -h, --help
+Show help message and exit.
 
 .SH EXAMPLES
 .TP
@@ -40,6 +52,15 @@ Compare two files with default settings:
 .TP
 Side-by-side comparison with custom tolerance:
 .B diff-numerics -y -t 0.01 file1.dat file2.dat
+.TP
+Compare only columns 1, 2, and 4:
+.B diff-numerics -C 1,2,4 file1.dat file2.dat
+.TP
+Highlight differing digits in color:
+.B diff-numerics -d file1.dat file2.dat
+.TP
+Show only lines that are equal within tolerance:
+.B diff-numerics --only-equal file1.dat file2.dat
 
 .SH AUTHOR
 Written by Alessandro Grassi (2025).

@@ -17,6 +17,13 @@
 #include "diff-numerics/NumericDiffOption.h"
 
 int main(int argc, char* argv[]) {
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
+        if (arg == "-h" || arg == "--help") {
+            NumericDiffOption::print_usage();
+            return 0;
+        }
+    }
     NumericDiffOption opts;
     if (!opts.parse(argc, argv)) return 1;
     if (!opts.validate()) return 1;

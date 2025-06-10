@@ -32,6 +32,12 @@ include_directories(include/diff-numerics)
 file(GLOB SOURCES "src/*.cpp" "src/libs/*.cpp")
 file(GLOB HEADERS "include/diff_numerics/*.h")
 
+# Set project version
+set(PROJECT_VERSION "0.1.0")
+
+# Add version definition for the compiler
+add_definitions(-DNUMERIC_DIFF_VERSION=\"${PROJECT_VERSION}\")
+
 # Main executable target
 add_executable(diff-numerics ${SOURCES})
 target_compile_options(diff-numerics PRIVATE
