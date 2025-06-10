@@ -58,3 +58,13 @@ install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/diff-numerics DESTINATION include)
 include(CTest)
 enable_testing()
 add_subdirectory(test)
+
+# Detect if using Clang and set standard library if needed
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    message(STATUS "Detected Clang: ${CMAKE_CXX_COMPILER}")
+    # Use libstdc++ (default on Linux). To use libc++, uncomment the next line:
+    # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+    # Optionally, specify include/library paths if needed:
+    # include_directories(/usr/include/c++/12)
+    # link_directories(/usr/lib/gcc/x86_64-linux-gnu/12)
+endif()

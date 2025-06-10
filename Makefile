@@ -30,7 +30,7 @@ all: $(BUILD_DIR)
 # Configure project and create build directory
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
-	cd $(BUILD_DIR) && $(CMAKE) ..
+	cd $(BUILD_DIR) && $(CMAKE) .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
 # Remove build and bin directories
 clean:
