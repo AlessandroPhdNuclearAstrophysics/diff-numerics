@@ -33,7 +33,7 @@ file(GLOB SOURCES "src/*.cpp" "src/libs/*.cpp")
 file(GLOB HEADERS "include/diff_numerics/*.h")
 
 # Set project version
-set(PROJECT_VERSION "0.1.0")
+set(PROJECT_VERSION "1.0.0")
 
 # Add version definition for the compiler
 add_definitions(-DNUMERIC_DIFF_VERSION=\"${PROJECT_VERSION}\")
