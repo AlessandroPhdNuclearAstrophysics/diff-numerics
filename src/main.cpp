@@ -29,6 +29,5 @@ int main(int argc, char* argv[]) {
     if (!opts.validate()) return 1;
     
     NumericDiff diff(opts);
-    diff.run();
-    return 0;
+    return diff.run();
 }

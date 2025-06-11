@@ -146,6 +146,14 @@ The binary will be placed in the `bin/` directory.
 ./bin/diff-numerics [options] file1 file2
 ```
 
+### Return Value
+
+- Returns `0` if the files are equal within tolerance.
+- Returns a positive integer equal to the number of differing lines if files differ.
+- Returns `-1` if an error occurred (e.g., file not found or invalid arguments).
+
+This makes it easy to use `diff-numerics` in scripts and CI pipelines for automated checks.
+
 ### Options
 
 | Option                        | Description                                                                 |
@@ -175,6 +183,7 @@ The binary will be placed in the `bin/` directory.
 - **Suppressed common lines:** Only lines with differences are shown.
 - **Quiet mode:** No output if files are equal within tolerance.
 - **Summary mode:** Prints a summary if files are not equal.
+- **Exit code:** See above for return value details.
 
 ---
 

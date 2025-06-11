@@ -7,6 +7,8 @@ diff-numerics \- compare numerical data files with tolerance
 .SH DESCRIPTION
 A command-line tool for comparing numerical data files with configurable tolerance, threshold, and output formatting. Designed for scientific and engineering workflows where small floating-point differences are expected.
 
+The program returns 0 if the files are equal within tolerance, a positive integer equal to the number of differing lines if files differ, and -1 if an error occurred (such as file not found or invalid arguments). This makes it suitable for use in scripts and automated pipelines.
+
 .SH OPTIONS
 .TP
 .B -y, --side-by-side
@@ -44,6 +46,11 @@ Show program version and exit.
 .TP
 .B -h, --help
 Show help message and exit.
+
+.SH RETURN VALUE
+Returns 0 if files are equal within tolerance.
+Returns a positive integer equal to the number of differing lines if files differ.
+Returns -1 if an error occurred (e.g., file not found or invalid arguments).
 
 .SH EXAMPLES
 .TP

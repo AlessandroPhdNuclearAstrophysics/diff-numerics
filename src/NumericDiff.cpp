@@ -39,13 +39,13 @@ NumericDiff::NumericDiff(const NumericDiffOption& opts)
       columns_to_compare_(opts.columns_to_compare) {}
 
 // Main entry: run the comparison and print results
-void NumericDiff::run() {
+int NumericDiff::run() {
     diff_lines_ = 0;
     max_percentage_error_ = 0.0;
     std::ifstream fin1(file1_), fin2(file2_);
     if (!fin1.is_open() || !fin2.is_open()) {
         std::cerr << "Error opening files.\n";
-        return;
+        return -1;
     }
     std::string line1, line2;
     size_t total_lines = 0;
@@ -87,14 +87,14 @@ void NumericDiff::run() {
     if (quiet_) {
         // Print nothing if files are equal, otherwise print as normal (with all options except quiet)
         if (diff_lines_ == 0) {
-            return;
+            return 0;
         } else {
             // Print summary as in only_equal_ mode
             std::cout << "Comparing " << file1_ << " and " << file2_ << "\n";
             std::cout << "Tolerance: " << tol_ << ", Threshold: " << threshold_ << "\n";
             std::cout << "Files DIFFER: " << diff_lines_ << " lines differ, max percentage error: " << max_percentage_error_ << "%\n";
         }
-        return;
+        return static_cast<int>(diff_lines_);
     }
 
     if (only_equal_) {
@@ -106,6 +106,7 @@ void NumericDiff::run() {
             std::cout << "Files DIFFER: " << diff_lines_ << " lines differ, max percentage error: " << max_percentage_error_ << "%\n";
         }
     }
+    return static_cast<int>(diff_lines_);
 }
 
 // Helper: count columns in a file (used for formatting)

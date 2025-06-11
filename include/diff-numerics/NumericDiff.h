@@ -17,8 +17,9 @@ class NumericDiff {
 public:
     // Constructor: set up comparison options and file paths
     explicit NumericDiff(const NumericDiffOption& opts);
-    // Run the comparison and print results according to options
-    void run();
+    // Run the comparison and print results according to options and returns the number of differing lines or 
+    // -1 if an error occurred (e.g., file not found)
+    int run();
 private:
     // File paths and options
     std::string file1_;
