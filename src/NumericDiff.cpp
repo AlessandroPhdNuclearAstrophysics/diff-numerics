@@ -102,6 +102,7 @@ int NumericDiff::run() {
         std::cout << "Tolerance: " << tol_ << ", Threshold: " << threshold_ << "\n";
         if (diff_lines_ == 0) {
             std::cout << "Files are EQUAL within tolerance.\n";
+            return 0;
         } else {
             std::cout << "Files DIFFER: " << diff_lines_ << " lines differ, max percentage error: " << max_percentage_error_ << "%\n";
         }
