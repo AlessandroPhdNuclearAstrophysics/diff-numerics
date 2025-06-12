@@ -57,7 +57,7 @@ int NumericDiff::run() {
         fileProblem = true;
     }
     if (fileProblem) {
-        return 2; // Error code for file access issues
+        return -1; // Error code for file access issues
     }
 
     // Check if files can be opened
@@ -71,7 +71,7 @@ int NumericDiff::run() {
         fileProblem = true;
     }
     if (fileProblem) {  
-        return 2;
+        return -1; // Error code for file access issues
     }
 
     std::string line1, line2;
