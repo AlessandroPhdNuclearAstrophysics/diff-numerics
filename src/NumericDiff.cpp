@@ -43,10 +43,37 @@ int NumericDiff::run() {
     diff_lines_ = 0;
     max_percentage_error_ = 0.0;
     std::ifstream fin1(file1_), fin2(file2_);
-    if (!fin1.is_open() || !fin2.is_open()) {
-        std::cerr << "Error opening files.\n";
-        return -1;
+
+    // Check if files exist before trying to open
+    bool fileProblem = false;
+    std::ifstream test1(file1_);
+    if (!test1.good()) {
+        std::cerr << "Error: '" << file1_ << "' does not exist or cannot be accessed.\n";
+        fileProblem = true;
     }
+    std::ifstream test2(file2_);
+    if (!test2.good()) {
+        std::cerr << "Error: '" << file2_ << "' does not exist or cannot be accessed.\n";
+        fileProblem = true;
+    }
+    if (fileProblem) {
+        return 2; // Error code for file access issues
+    }
+
+    // Check if files can be opened
+    fileProblem = false;
+    if (!fin1.is_open()) {
+        std::cerr << "Error: Cannot open file '" << file1_ << "'\n";
+        fileProblem = true;
+    }
+    if (!fin2.is_open()) {
+        std::cerr << "Error: Cannot open file '" << file2_ << "'\n";
+        fileProblem = true;
+    }
+    if (fileProblem) {  
+        return 2;
+    }
+
     std::string line1, line2;
     size_t total_lines = 0;
     bool file1_has_line = true, file2_has_line = true;
